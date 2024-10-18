@@ -1,19 +1,48 @@
 import React, { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useUserStore } from "../context/userStore";
+import Navbar from "../Components/Navbar";
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const setUser = useUserStore((state) => state.setUser);
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const location = useLocation(); // To get state passed during navigation
+    const successMessage = location.state?.message; // Access success message from signup
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Simulate API call for login
+        try {
+            const response = await mockApiLogin(email, password); 
+            const { user, token } = response; 
 
-    }
+            // Set user data in Zustand store
+            setUser({
+                name: user.name,
+                email: user.email,
+                token: token,
+            });
+
+            navigate('/home');
+        } catch (err) {
+            setError('Invalid email or password');
+        }
+    };
     return(
+        <>
+        <Navbar />
         <div className=" flex justify-start items-center">
             <div className="bg-violet-200 p-8 rounded-lg shadow-xl w-full max-w-md m-12">
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+
+                {/* {successMessage && (
+                    <p className="text-green-500 text-center mb-4">{successMessage}</p>
+                )} */}
 
                 <form onSubmit={handleSubmit}>
 
@@ -62,7 +91,24 @@ const Login = () => {
                 </form>
             </div>
         </div>
+        </>
     )
+};
+
+// Simulated API login function (replace with real API call)
+const mockApiLogin = async (email, password) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (email === "user@example.com" && password === "password123") {
+                resolve({
+                    user: { name: "John Doe", email: "user@example.com" },
+                    token: "fake-jwt-token",
+                });
+            } else {
+                reject("Invalid credentials");
+            }
+        }, 1000);
+    });
 };
 
 export default Login
