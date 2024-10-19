@@ -2,6 +2,8 @@ import React, {useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/userStore';
 import Navbar from "../Components/Navbar";
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 const NAME_REGEX = /^[A-Za-z\s]{3,32}$/;
@@ -116,7 +118,8 @@ const Signup = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-2 top-2 text-gray-500 focus:outline-none"
                         >
-                            {showPassword ? 'Hide' : 'Show'}
+                        {showPassword ? <FontAwesomeIcon icon={faEye} /> : <FontAwesomeIcon icon={faEyeSlash} />}
+
                         </button>
                     </div>
 
@@ -135,7 +138,8 @@ const Signup = () => {
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             className="absolute right-2 top-2 text-gray-500 focus:outline-none"
                         >
-                            {showConfirmPassword ? 'Hide' : 'Show'}
+                        {showPassword ? <FontAwesomeIcon icon={faEye} /> : <FontAwesomeIcon icon={faEyeSlash} />}
+
                         </button>
                     </div>
 

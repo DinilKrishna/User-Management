@@ -1,22 +1,23 @@
-import React, { useState } from "react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
-import { useUserStore } from "../context/userStore";
-import Navbar from "../Components/Navbar";
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from 'react'
+import { useUserStore } from '../context/userStore';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import Navbar from '../Components/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 
-const Login = () => {
+
+const AdminLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const setUser = useUserStore((state) => state.setUser);
     const navigate = useNavigate();
-    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
+    const [showPassword, setShowPassword] = useState(false); 
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const location = useLocation(); // To get state passed during navigation
-    const successMessage = location.state?.message; // Access success message from signup
+    const location = useLocation(); 
+    const successMessage = location.state?.message;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,9 +41,9 @@ const Login = () => {
     };
     return(
         <>
-        <Navbar />
+        <Navbar/>
         <div className=" flex justify-start items-center">
-            <div className="bg-violet-200 p-8 rounded-lg shadow-xl w-full max-w-md m-12">
+            <div className="bg-violet-800 p-8 rounded-lg shadow-xl w-full max-w-md m-12">
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
                 {/* {successMessage && (
@@ -67,9 +68,9 @@ const Login = () => {
                         <input
                             type={showPassword ? "text" : "password"}
                             id="password"
-                            value={formData.password}
+                            value={password}
                             placeholder='Password'
-                            onChange={handleChange}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
@@ -78,7 +79,8 @@ const Login = () => {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-2 top-2 text-gray-500 focus:outline-none"
                         >
-                            {showPassword ? <FontAwesomeIcon icon={faEye} /> : <FontAwesomeIcon icon={faEyeSlash} />}
+                        {showPassword ? <FontAwesomeIcon icon={faEye} /> : <FontAwesomeIcon icon={faEyeSlash} />}
+
                         </button>
                     </div>
 
@@ -122,5 +124,4 @@ const mockApiLogin = async (email, password) => {
         }, 1000);
     });
 };
-
-export default Login
+export default AdminLogin
