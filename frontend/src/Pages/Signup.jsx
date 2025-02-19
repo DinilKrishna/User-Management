@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+import axiosInstance from '../api/axiosInstance';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/userStore';
 import Navbar from "../Components/Navbar";
@@ -22,52 +23,47 @@ const Signup = () => {
     const setUser = useUserStore((state) => state.setUser); // Zustand action to set user data
     const navigate = useNavigate(); // For redirecting after signup
 
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        if (token) navigate("/home"); // Redirect if already logged in
+    }, [navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         if (!NAME_REGEX.test(name)){
-            setError('Invalid name format. Name should only consist of alphabets and spaces and should be between 3-32 characters');
+            setError('Invalid name format.');
             return;
-        }else {
-            setError(''); 
         }
         if (!EMAIL_REGEX.test(email)){
             setError('Invalid email');
             return;
-        }else {
-            setError('');
         }
         if (!PASSWORD_REGEX.test(password)){
-            setError('Password must be 8-24 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.');
+            setError('Password must be 8-24 characters long.');
             return;
-        }else {
-            setError(''); 
         }
         if (password !== confirmPassword){
             setError('Passwords do not match');
             return;
-        }else {
-            setError(''); 
         }
-
+    
         setError('');
-        console.log({ name, email, password });
-
+        
         try {
-            const response = await mockApiSignup(name, email, password); // Simulated API call
-            const { user, token } = response;
-
-            // Set user data in Zustand store
-            setUser({
-                name: user.name,
-                email: user.email,
-                token: token,
+            const [firstName, lastName] = name.split(' '); // Split full name into first and last name
+            const response = await axiosInstance.post('signup/', {
+                username: name,
+                email,
+                password,
+                confirm_password: confirmPassword
             });
-
-            // Redirect to home page
-            navigate('/', alert('Signup Succesful. Please Log in!'));
+    
+            alert('Signup successful. Please log in!');
+            navigate('/');
         } catch (err) {
-            setError('Signup failed. Please try again.');
+            console.log("Signup error:", err);
+            setError(err.response?.data?.error || 'Signup failed. Try again.');
         }
     };
 

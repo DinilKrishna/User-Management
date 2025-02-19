@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
+import axiosInstance from "../api/axiosInstance";
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useUserStore } from "../context/userStore";
 import Navbar from "../Components/Navbar";
@@ -18,24 +19,30 @@ const Login = () => {
     const location = useLocation(); // To get state passed during navigation
     const successMessage = location.state?.message; // Access success message from signup
 
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        if (token) navigate("/home"); // Redirect if already logged in
+    }, [navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Simulate API call for login
+    
         try {
-            const response = await mockApiLogin(email, password); 
-            const { user, token } = response; 
-
-            // Set user data in Zustand store
+            const response = await axiosInstance.post('login/', { email, password });
+            const { access, refresh, user } = response.data;
+    
+            localStorage.setItem('accessToken', access);
+            localStorage.setItem('refreshToken', refresh);
+            
             setUser({
-                name: user.name,
+                name: `${user.first_name} ${user.last_name}`,
                 email: user.email,
-                token: token,
+                token: access,
             });
-
+    
             navigate('/home');
         } catch (err) {
-            setError('Invalid email or password');
+            setError(err.response?.data?.error || 'Invalid email or password');
         }
     };
     return(

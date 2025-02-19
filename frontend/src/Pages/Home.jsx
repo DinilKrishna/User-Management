@@ -1,7 +1,17 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Navbar from '../Components/Navbar';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+    const navigate = useNavigate();
+    const [token, setToken] = useState(localStorage.getItem('accessToken'));
+
+    useEffect(() => {
+        if (!localStorage.getItem('accessToken')) {
+            navigate('/');
+        }
+    }, [token, navigate]); 
+
     return (
         <div>
             <Navbar />

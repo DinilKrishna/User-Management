@@ -1,15 +1,17 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
+    const navigate = useNavigate();
     const location = useLocation();
 
     // Handler for logout
     const handleLogout = () => {
-        console.log('User logged out');
-        // Add actual logout logic here, like clearing auth tokens, etc.
+        localStorage.removeItem('accessToken');  
+        localStorage.removeItem('refreshToken');
+        navigate('/');
     };
 
     // Check if the logout button should be displayed
