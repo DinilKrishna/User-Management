@@ -8,6 +8,10 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    // If the URL includes "login", skip attaching the token.
+    if (config.url && (config.url.includes('login/') || config.url.includes('admin/login/'))) {
+      return config;
+    }
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

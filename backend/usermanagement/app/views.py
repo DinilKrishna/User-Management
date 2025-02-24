@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from .models import UserProfile
 
 class UserSignupView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserProfileSerializer(data=request.data)
         print(request.data)
@@ -42,7 +43,6 @@ class UserLoginView(APIView):
 
 
 class AdminLoginView(APIView):
-    print('jiii')
     permission_classes = [AllowAny]
     def post(self, request):
         print('asjdkfhlsajdfhjkl')
