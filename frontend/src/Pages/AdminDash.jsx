@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../Components/Navbar';
 import UserTable from '../Components/UserTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
+import { useUserStore } from '../context/userStore';
 
 const AdminDash = () => {
+    const navigate = useNavigate();
+    const user = useUserStore((state) => state.user);
     const [showPassword, setShowPassword] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -15,6 +19,16 @@ const AdminDash = () => {
         type: 'User',
         active: false
     });
+
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        const isAdminStored = localStorage.getItem('isAdmin');
+        // if (!token || !user || isAdminStored !== 'true') {
+        if (!token || !user || !user.isAdmin) {
+          navigate('/admin'); // Redirect to admin login if not admin
+        }
+    }, [navigate, user]);
+    
 
     const handleChange = (e) => {
         setFormData({

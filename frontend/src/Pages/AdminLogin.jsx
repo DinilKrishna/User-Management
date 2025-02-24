@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axiosInstance from "../api/axiosInstance";
 import { useUserStore } from '../context/userStore';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Navbar from '../Components/Navbar';
@@ -21,22 +22,29 @@ const AdminLogin = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        console.log(email, password)
         // Simulate API call for login
         try {
-            const response = await mockApiLogin(email, password); 
-            const { user, token } = response; 
+            const response = await axiosInstance.post('admin/login/', { email, password }); 
+            const { access, refresh, user } = response.data;
 
-            // Set user data in Zustand store
+            // Set user data in your Zustand store (you can also add an isAdmin flag)
             setUser({
-                name: user.name,
+                name: `${user.first_name} ${user.last_name}`,
                 email: user.email,
-                token: token,
+                token: access,
+                isAdmin: user.isAdmin,
             });
 
-            navigate('/home');
+            // Optionally, also save the token in localStorage
+            localStorage.setItem('accessToken', access);
+            localStorage.setItem('refreshToken', refresh);
+            localStorage.setItem('isAdmin', 'true');
+    
+            // Redirect to admin dashboard
+            navigate('/admin/dashboard');
         } catch (err) {
-            setError('Invalid email or password');
+            setError(err.response?.data?.error || 'Invalid email or password');
         }
     };
     return(

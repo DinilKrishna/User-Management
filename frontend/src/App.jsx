@@ -7,8 +7,16 @@ import Home from './Pages/Home';
 import UserProfile from './Pages/UserProfile';
 import AdminLogin from './Pages/AdminLogin';
 import AdminDash from './Pages/AdminDash';
+import { useUserStore } from './context/userStore';
+import { useEffect } from 'react';
 
 function App() {
+
+  const rehydrateUser = useUserStore((state) => state.rehydrateUser);
+
+  useEffect(() => {
+    rehydrateUser();
+  }, [rehydrateUser]);
 
   return (
     <>

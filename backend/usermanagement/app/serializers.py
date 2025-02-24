@@ -8,8 +8,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['username', 'email', 'password', 'confirm_password']
-
+        fields = ['id', 'username', 'email', 'is_staff', 'is_active', 'password', 'confirm_password']
+        extra_kwargs = {
+            'is_staff': {'read_only': True},
+            'is_active': {'read_only': True},
+        }
     def validate_username(self, value):
         # Ensure username length is between 3 and 32 and only contains letters and spaces
         if not (3 <= len(value) <= 32):

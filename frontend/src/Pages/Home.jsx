@@ -11,6 +11,7 @@ const Home = () => {
             navigate('/');
         }
     }, [token, navigate]); 
+    
 
     return (
         <div>

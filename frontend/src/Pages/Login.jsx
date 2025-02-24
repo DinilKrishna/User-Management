@@ -14,15 +14,24 @@ const Login = () => {
     const setUser = useUserStore((state) => state.setUser);
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
+    // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
     const location = useLocation(); // To get state passed during navigation
-    const successMessage = location.state?.message; // Access success message from signup
+    // const successMessage = location.state?.message; // Access success message from signup
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
-        if (token) navigate("/home"); // Redirect if already logged in
-    }, [navigate]);
+        if (token) {
+          navigate("/home");
+        } else {
+          setIsCheckingAuth(false);
+        }
+      }, [navigate]);
+    
+      if (isCheckingAuth) {
+        return null;
+      }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
