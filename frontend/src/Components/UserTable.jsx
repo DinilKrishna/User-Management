@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../api/axiosInstance';
 
-const UserTable = ({ searchTerm }) => {
+const UserTable = ({ searchTerm, refreshFlag }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +19,7 @@ const UserTable = ({ searchTerm }) => {
     };
 
     fetchUsers();
-  }, []);
+  }, [refreshFlag]);
 
   // Filter users based on searchTerm (if provided)
   const filteredUsers = users.filter((user) =>

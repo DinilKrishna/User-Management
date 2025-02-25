@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, AdminUserCreateSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAdminUser, AllowAny
 from .models import UserProfile
@@ -45,7 +45,6 @@ class UserLoginView(APIView):
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        print('asjdkfhlsajdfhjkl')
         email = request.data.get("email")
         password = request.data.get("password")
         user = authenticate(email=email, password=password)
@@ -77,3 +76,29 @@ class UserListView(APIView):
         users = UserProfile.objects.all()
         serializer = UserProfileSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AdminAddUserView(APIView):
+    permission_classes = [AllowAny]
+    print("AdminAddUserView called")
+
+    def post(self, request):
+        print("AdminAddUserView POST called")
+        data = request.data.copy()
+        data['username'] = data.get('name')
+        data['is_active'] = data.get('active', False)
+        user_type = data.get('type', 'User')
+        if user_type == 'Admin':
+            data['is_staff'] = True
+        else:
+            data['is_staff'] = False
+
+        serializer = AdminUserCreateSerializer(data=data)
+        if serializer.is_valid():
+            user = serializer.save()
+            print("User created:", user)  # Debug print on success
+            return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        else:
+            print("Serializer errors:", serializer.errors)  # Debug print on error
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

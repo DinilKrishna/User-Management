@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axiosInstance from "../api/axiosInstance";
 import { useUserStore } from '../context/userStore';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link, Navigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -13,6 +13,7 @@ const AdminLogin = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const setUser = useUserStore((state) => state.setUser);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false); 
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -20,9 +21,17 @@ const AdminLogin = () => {
     const location = useLocation(); 
     const successMessage = location.state?.message;
 
+    const token = localStorage.getItem('accessToken');
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+    if (token && isAdmin) {
+        return <Navigate to="/admin/dashboard" replace />;
+    }
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(email, password)
+
         // Simulate API call for login
         try {
             const response = await axiosInstance.post('admin/login/', { email, password }); 
@@ -47,6 +56,7 @@ const AdminLogin = () => {
             setError(err.response?.data?.error || 'Invalid email or password');
         }
     };
+
     return(
         <>
         <Navbar/>

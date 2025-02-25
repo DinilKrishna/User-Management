@@ -5,17 +5,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../context/userStore';
+import axiosInstance from '../api/axiosInstance';
 
 const AdminDash = () => {
     const navigate = useNavigate();
+    const [error, setError] = useState('');
     const user = useUserStore((state) => state.user);
     const [showPassword, setShowPassword] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [refreshFlag, setRefreshFlag] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        password:    '',
         type: 'User',
         active: false
     });
@@ -23,11 +27,10 @@ const AdminDash = () => {
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         const isAdminStored = localStorage.getItem('isAdmin');
-        // if (!token || !user || isAdminStored !== 'true') {
-        if (!token || !user || !user.isAdmin) {
-          navigate('/admin'); // Redirect to admin login if not admin
+        if (!token || isAdminStored !== 'true') {
+          navigate('/admin');
         }
-    }, [navigate, user]);
+      }, [navigate]);
     
 
     const handleChange = (e) => {
@@ -37,11 +40,21 @@ const AdminDash = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('User data submitted:', formData);
-        setFormData({ name: '', email: '', type: 'User', active: false });
-        setShowModal(false);
+        try {
+          // Call the new add-user endpoint
+          const response = await axiosInstance.post('admin/add-user/', formData);
+          console.log('User created:', response.data);
+          // Optionally refresh the user list in your UserTable
+          // Clear the form and close the modal
+          setFormData({ name: '', email: '', type: 'User', active: false });
+          setShowModal(false);
+          setRefreshFlag(prev => !prev);
+        } catch (err) {
+            console.error("Error creating user:", err);
+            setError(err.response?.data?.error || 'Error creating user');
+        }
     };
 
     return (
@@ -65,7 +78,7 @@ const AdminDash = () => {
                 </div>
 
                 <div className='overflow-x-auto'>
-                    <UserTable searchTerm={searchTerm} />
+                    <UserTable searchTerm={searchTerm} refreshFlag={refreshFlag} />
                 </div>
             </div>
 
@@ -127,6 +140,9 @@ const AdminDash = () => {
                                     <option value='Moderator'>Staff</option>
                                 </select>
                             </div>
+
+                            {error && <p className="text-red-500 mb-4">{error}</p>}
+
                             <button type='submit' className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'>
                                 Submit
                             </button>

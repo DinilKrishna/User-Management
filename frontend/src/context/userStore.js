@@ -11,8 +11,8 @@ export const useUserStore = create((set) => ({
   rehydrateUser: () => {
     const token = localStorage.getItem('accessToken');
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
-    if (token) {
-      // You may also want to store additional info like name, email, etc.
+    if (token && isAdmin) {
+      // Optionally, decode token or store additional info
       set({ user: { token, isAdmin } });
     }
   },
