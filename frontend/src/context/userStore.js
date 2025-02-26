@@ -11,9 +11,11 @@ export const useUserStore = create((set) => ({
   rehydrateUser: () => {
     const token = localStorage.getItem('accessToken');
     const isAdmin = localStorage.getItem('isAdmin') === 'true';
-    if (token && isAdmin) {
-      // Optionally, decode token or store additional info
-      set({ user: { token, isAdmin } });
+    const email = localStorage.getItem('email');
+    const username = localStorage.getItem('username');
+    if (token) {
+      // Even if isAdmin is false, you can set the user details.
+      set({ user: { token, isAdmin, email, username } });
     }
   },
 }));

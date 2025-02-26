@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import UserProfileSerializer, AdminUserCreateSerializer
@@ -80,13 +80,14 @@ class UserListView(APIView):
 
 
 class AdminAddUserView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminUser]
     print("AdminAddUserView called")
 
     def post(self, request):
         print("AdminAddUserView POST called")
         data = request.data.copy()
-        data['username'] = data.get('name')
+        print(data)
+        data['username'] = data.get('username')
         data['is_active'] = data.get('active', False)
         user_type = data.get('type', 'User')
         if user_type == 'Admin':
@@ -102,3 +103,13 @@ class AdminAddUserView(APIView):
         else:
             print("Serializer errors:", serializer.errors)  # Debug print on error
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class UserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserProfile.objects.all()
+    permission_classes = [IsAdminUser]
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return AdminUserCreateSerializer
+        return UserProfileSerializer

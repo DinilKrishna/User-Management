@@ -17,7 +17,8 @@ const Home = () => {
         <div>
             <Navbar />
             <div className="flex flex-col items-center mt-8">
-                <h1 className="text-2xl">Hi User, welcome to the user management website</h1>
+                <h1 className="text-2xl">Hi User, welcome to the user management website</h1><br />
+                <h2 className="text-xl">Only never cache schemes and logging out issues left as of now</h2>
             </div>
         </div>
     );

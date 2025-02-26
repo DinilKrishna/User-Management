@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../api/axiosInstance';
 
-const UserTable = ({ searchTerm, refreshFlag }) => {
+const UserTable = ({ searchTerm, refreshFlag, handleEditClick }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch the list of users from the backend
+  // Fetch the list of users from the backend; refresh when refreshFlag changes.
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -26,6 +26,20 @@ const UserTable = ({ searchTerm, refreshFlag }) => {
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Delete user function: show a confirmation, then call the API and update state.
+  const handleDelete = async (userId) => {
+    const confirmed = window.confirm("Are you sure you want to delete the user?");
+    if (!confirmed) return;
+    
+    try {
+      await axiosInstance.delete(`users/${userId}/`);
+      // Remove the deleted user from the local state so the table updates instantly.
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+    } catch (error) {
+      console.error("Error deleting user:", error.response?.data || error.message);
+    }
+  };
 
   if (loading) {
     return <div>Loading users...</div>;
@@ -51,7 +65,7 @@ const UserTable = ({ searchTerm, refreshFlag }) => {
               <td className='py-2 px-4 border-t'>{user.id}</td>
               <td className='py-2 px-4 border-t'>{user.username}</td>
               <td className='py-2 px-4 border-t'>{user.email}</td>
-              <td className='py-2 px-4 border-t'>{user.is_staff? 'Admin' : 'User'}</td>
+              <td className='py-2 px-4 border-t'>{ user.is_staff ? (user.is_superuser ? 'Admin' : 'Staff') : 'User' }</td>
               <td className='py-2 px-4 border-t'>{user.is_active ? 'Active' : 'Blocked'}</td>
               <td className='py-2 px-4 border-t'>
                 <button 
@@ -73,8 +87,6 @@ const UserTable = ({ searchTerm, refreshFlag }) => {
           ))}
         </tbody>
       </table>
-
-      {/* Edit Modal and its handlers (if needed) */}
     </div>
   );
 };
